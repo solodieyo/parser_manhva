@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import delete, update
 
 from db.models import Manhva
+from utils.manhva_names import manhva_names
 
 
 async def add_manhva(names: List[str], user_id: int, session: AsyncSession):
@@ -12,15 +13,18 @@ async def add_manhva(names: List[str], user_id: int, session: AsyncSession):
 		record_manhva.user_id = user_id
 		record_manhva.manhva_name = name
 		session.add(record_manhva)
+	await manhva_names.refresh_list()
 	await session.commit()
 
 
 async def delete_manhva(name: str, user_id: int, session: AsyncSession):
 	await session.execute(delete(Manhva).where((Manhva.user_id == user_id) & (Manhva.manhva_name == name)))
+	await manhva_names.refresh_list()
 	await session.commit()
 
 
 async def archive_manhva(name: str, user_id: int, session: AsyncSession):
 	await session.execute(update(Manhva).where((Manhva.user_id == user_id) & (Manhva.manhva_name == name))
 						  .values(archived=True))
+	await manhva_names.refresh_list()
 	await session.commit()

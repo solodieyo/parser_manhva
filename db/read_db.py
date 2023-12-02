@@ -4,9 +4,14 @@ from sqlalchemy import select
 from .models import Manhva
 
 
-async def get_manhva_names(session: AsyncSession, user_id):
-	names = await session.execute(select(Manhva.manhva_name)
-								  .where((Manhva.user_id == user_id) & (Manhva.archived == False)))
+async def get_all_manhva_names(session: AsyncSession):
+	names = await session.execute(select(Manhva.manhva_name).distinct().where(Manhva.archived == False))
+	names = names.scalars().all()
+	return names
+
+
+async def get_user_manhva_names(session: AsyncSession, user_id):
+	names = await session.execute(select(Manhva.manhva_name).where(Manhva.user_id == user_id))
 	names = names.scalars().all()
 	return names
 
