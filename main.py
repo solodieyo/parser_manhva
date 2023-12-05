@@ -5,6 +5,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.enums.parse_mode import ParseMode
 
 from middleware.db_session import DBSessionMiddleware
+from db.base import session
 from config import config
 from handlers import get_handlers_router
 from utils.manhva_names import manhva_names
@@ -17,12 +18,12 @@ async def main():
     dp.include_router(get_handlers_router())
     dp.update.middleware(DBSessionMiddleware(session_pool=session))
     await bot.delete_webhook(drop_pending_updates=True)
-    print(manhva_names.get_names())
     await dp.start_polling(bot)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
-        print(123)
+        print("start pars bot")
         asyncio.run(main())
     except KeyboardInterrupt:
-        print('end work1')
+        print("pars bot finish")

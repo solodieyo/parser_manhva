@@ -1,5 +1,3 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from db.read_db import get_all_manhva_names
 from db.base import create_session
 
@@ -11,7 +9,7 @@ class ManhvaName:
         async with create_session() as session:
             self.__manhva_names = await get_all_manhva_names(session=session)
 
-    def get_names(self):
+    def manhva_names(self):
         return self.__manhva_names
 
 
