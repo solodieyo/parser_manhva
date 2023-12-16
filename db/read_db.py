@@ -7,10 +7,9 @@ from .models import Manhva, User, ManhvaUserAssociation
 
 
 async def get_all_manhva_names(session: AsyncSession):
-    # names = await session.execute(select(Manhva.manhva_name).distinct().where(Manhva.archived == False))
-    # names = names.scalars().all()
-    # return names
-    pass
+    names = await session.execute(select(Manhva.manhva_name))
+    names = names.scalars().all()
+    return names
 
 
 async def get_user_manhva(session: AsyncSession, user_id: int):
@@ -25,14 +24,16 @@ async def get_user_manhva(session: AsyncSession, user_id: int):
             )
         )
         user = await session.scalar(stmt)
-        print(user)
         return user
     except NoResultFound:
         return None
 
 
 async def get_users_reader(session: AsyncSession, manhva: str):
-    # users = await session.execute(select(Manhva.user_id)
-    # 							  .where((Manhva.manhva_name == manhva) & (Manhva.archived == False)))
-    # return users.scalars().all()
-    pass
+    stmt = (
+        select(Manhva)
+        .where(Manhva.manhva_name == manhva)
+        .options(selectinload(Manhva.user_details).joinedload(ManhvaUserAssociation.user))
+    )
+    users = await session.scalars(stmt)
+    return users.one()

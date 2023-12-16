@@ -10,8 +10,9 @@ from config.config import CHANNEL_ID
 from db.read_db import get_users_reader
 from states.user_states import UserActionState
 from keyboards.channel_keyborads import channel_post_keyboard
-from db.write_db import add_manhva, delete_manhva
+from db.write_db import add_manhva, get_or_create_manhva
 from utils.manhva_names import manhva_names
+from db.models import ManhvaUserAssociation
 
 router = Router()
 
@@ -45,14 +46,15 @@ async def from_user_bot_handler(message: Message, session: AsyncSession, bot: Bo
     manhva_content = message.text.split("\n")
     manhva_name = manhva_content[0]
     text = f"{manhva_name}\n{manhva_content[1]}\n\n{manhva_content[-1]}"
+    manhva = await get_or_create_manhva(session=session, manhva_name=manhva_name)
     await bot.send_message(
         chat_id=CHANNEL_ID,
         text=text,
-        reply_markup=channel_post_keyboard(callback_data=manhva_name),
+        reply_markup=channel_post_keyboard(callback_data=int(manhva.id)),
     )
     await asyncio.sleep(2)
     if manhva_name in manhva_names.manhva_names():
-        users = await get_users_reader(session=session, manhva=manhva_name)
-        for user in users:
-            await bot.send_message(chat_id=user, text=text)
+        manhvas = await get_users_reader(session=session, manhva=manhva_name)
+        for manhva in manhvas.user_details:  # type: ManhvaUserAssociation
+            await bot.send_message(chat_id=manhva.user.user_id, text=text)
             await asyncio.sleep(1)
