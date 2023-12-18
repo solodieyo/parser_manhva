@@ -16,7 +16,8 @@ class Manhva(Base):
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     manhva_name = mapped_column(Text, nullable=False)
     user_details: Mapped[list["ManhvaUserAssociation"]] = relationship(
-        back_populates="manhva", lazy='selectin'
+        back_populates="manhva",
+        # lazy='selectin'
     )
 
 
@@ -26,7 +27,8 @@ class User(Base):
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id = mapped_column(BigInteger, nullable=False, index=True)
     manhva_details: Mapped[list["ManhvaUserAssociation"]] = relationship(
-        back_populates="user", lazy='selectin'
+        back_populates="user",
+        # lazy='selectin'
     )
 
 
@@ -40,5 +42,7 @@ class ManhvaUserAssociation(Base):
     manhva_id: Mapped[int] = mapped_column(ForeignKey("manhva.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
 
-    user: Mapped["User"] = relationship(back_populates="manhva_details", lazy='selectin')
-    manhva: Mapped["Manhva"] = relationship(back_populates="user_details", lazy='selectin')
+    user: Mapped["User"] = relationship(back_populates="manhva_details")
+    # lazy='selectin'
+    manhva: Mapped["Manhva"] = relationship(back_populates="user_details")
+                                            # lazy='selectin')
