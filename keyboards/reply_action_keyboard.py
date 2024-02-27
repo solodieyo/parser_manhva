@@ -6,4 +6,4 @@ def action_keyboard():
     builder.row(KeyboardButton(text="Добавить"), KeyboardButton(text="Удалить"))
     builder.row(KeyboardButton(text="Список"))
     builder.adjust(3, repeat=True)
-    return builder.as_markup()
+    return builder.as_markup(resize_keyboard=True)

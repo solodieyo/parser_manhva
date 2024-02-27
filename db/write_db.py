@@ -2,14 +2,16 @@ from typing import List
 
 from sqlalchemy.exc import NoResultFound, IntegrityError, PendingRollbackError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import delete, update, select
+from sqlalchemy import delete, update, select, and_
 from sqlalchemy.orm import selectinload
 
 from db.models import Manhva, User, ManhvaUserAssociation
 from utils.manhva_names import manhva_names
 
 
-async def add_manhva(user_id: int, session: AsyncSession, names: List[str] = None, _id: int = None):
+async def add_manhva(
+    user_id: int, session: AsyncSession, names: List[str] = None, _id: int = None
+):
     user = await get_or_create_user(session=session, user_id=user_id)
     if _id:
         manhva = await get_manhva_for_id(session=session, _id=_id)
@@ -27,11 +29,18 @@ async def add_manhva(user_id: int, session: AsyncSession, names: List[str] = Non
 
 
 async def delete_manhva(name: str, user_id: int, session: AsyncSession):
+    user = await get_or_create_user(session=session, user_id=user_id)
+    manhva = await get_or_create_manhva(session=session, manhva_name=name)
     await session.execute(
-        delete(Manhva).where((Manhva.user_id == user_id) & (Manhva.manhva_name == name))
+        delete(ManhvaUserAssociation).where(
+            and_(
+                ManhvaUserAssociation.manhva_id == manhva.id,
+                ManhvaUserAssociation.user_id == user.id,
+            )
+        )
     )
-    await manhva_names.refresh_list()
     await session.commit()
+    await manhva_names.refresh_list()
 
 
 async def get_or_create_user(session: AsyncSession, user_id: int):

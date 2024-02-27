@@ -45,4 +45,4 @@ class ManhvaUserAssociation(Base):
     user: Mapped["User"] = relationship(back_populates="manhva_details")
     # lazy='selectin'
     manhva: Mapped["Manhva"] = relationship(back_populates="user_details")
-                                            # lazy='selectin')
+    # lazy='selectin')

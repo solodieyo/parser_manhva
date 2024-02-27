@@ -33,7 +33,9 @@ async def get_users_reader(session: AsyncSession, manhva: str):
     stmt = (
         select(Manhva)
         .where(Manhva.manhva_name == manhva)
-        .options(selectinload(Manhva.user_details).joinedload(ManhvaUserAssociation.user))
+        .options(
+            selectinload(Manhva.user_details).joinedload(ManhvaUserAssociation.user)
+        )
     )
     users = await session.scalars(stmt)
     return users.one()

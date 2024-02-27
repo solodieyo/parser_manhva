@@ -10,7 +10,7 @@ from config.config import CHANNEL_ID
 from db.read_db import get_users_reader
 from states.user_states import UserActionState
 from keyboards.channel_keyborads import channel_post_keyboard
-from db.write_db import add_manhva, get_or_create_manhva
+from db.write_db import add_manhva, get_or_create_manhva, delete_manhva
 from utils.manhva_names import manhva_names
 from db.models import ManhvaUserAssociation
 
@@ -30,15 +30,15 @@ async def get_manhva_name(
     )
 
 
-# @router.message(StateFilter(UserActionState.remove_manhva))
-# async def remove_manhva(
-#     message: Message, state: FSMContext, session: AsyncSession, bot: Bot
-# ):
-#     await delete_manhva(
-#         session=session, user_id=message.from_user.id, name=message.text
-#     )
-#     await state.set_state(state=None)
-#     await message.answer("Манхва успешно удалена")
+@router.message(StateFilter(UserActionState.remove_manhva))
+async def remove_manhva(
+    message: Message, state: FSMContext, session: AsyncSession, bot: Bot
+):
+    await delete_manhva(
+        session=session, user_id=message.from_user.id, name=message.text
+    )
+    await state.set_state(state=None)
+    await message.answer("Манхва успешно удалена")
 
 
 @router.message(F.from_user.id == 1920003379)
